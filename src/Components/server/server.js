@@ -1,6 +1,5 @@
 const express = require("express");
 const app = express();
-const https = require("https");
 
 var path = require("path");
 var bodyParser = require("body-parser");

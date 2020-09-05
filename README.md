@@ -1,68 +1,139 @@
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+# **Full Throttle Assignment**
 
-## Available Scripts
 
-In the project directory, you can run:
 
-### `npm start`
+## why we are using Mock-API ?
 
-Runs the app in the development mode.<br />
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+Development: If back end and front end development is being worked upon in parallel, then our UI would require dummy data to build our UI against. Something like a dummy response will help render our UI.
 
-The page will reload if you make edits.<br />
-You will also see any lint errors in the console.
+Testing: You could manually test our UI when your back end is not available.
 
-### `npm test`
+### Lets Start with Creating a react App
 
-Launches the test runner in the interactive watch mode.<br />
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+```
+npx create-react-app fullthrottlelabs
+cd fullthrottlelabs
+npm start
+```
+This should bring up your web app locally on http://localhost.com:3000 (mostly in port 3000).
 
-### `npm run build`
+## Setting Up a Local Mock API for your Front-end (React) Project
 
-Builds the app for production to the `build` folder.<br />
-It correctly bundles React in production mode and optimizes the build for the best performance.
+Now we have a json file with test data. the file is named as **data.json**
 
-The build is minified and the filenames include the hashes.<br />
-Your app is ready to be deployed!
+```
+{
+	"ok": true,
+	"members": [{
+			"id": "W012A3CDE",
+			"real_name": "Egon Spengler",
+			"tz": "America/Los_Angeles",
+			"activity_periods": [{
+					"start_time": "Feb 1 2020  1:33PM",
+					"end_time": "Feb 1 2020 1:54PM"
+				},
+				{
+					"start_time": "Mar 1 2020  11:11AM",
+					"end_time": "Mar 1 2020 2:00PM"
+				},
+				{
+					"start_time": "Mar 16 2020  5:33PM",
+					"end_time": "Mar 16 2020 8:02PM"
+				}
+			]
+		},
+		{
+			"id": "W07QCRPA4",
+			"real_name": "Glinda Southgood",
+			"tz": "Asia/Kolkata",
+			"activity_periods": [{
+					"start_time": "Feb 1 2020  1:33PM",
+					"end_time": "Feb 1 2020 1:54PM"
+				},
+				{
+					"start_time": "Mar 1 2020  11:11AM",
+					"end_time": "Mar 1 2020 2:00PM"
+				},
+				{
+					"start_time": "Mar 16 2020  5:33PM",
+					"end_time": "Mar 16 2020 8:02PM"
+				}
+			]
+		}
+	]
+}
+```
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+To read the data from the data.json file, simple logic is implemented in dataController.js file
 
-### `npm run eject`
+```
+const path = require("path");
+const fs = require("fs");
+const pathToData = path.join(__dirname + "../../../");
 
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
+const getJsonData = function(pathToData, filename) {
+    var filename = path.join(pathToData, filename);
+    return JSON.parse(fs.readFileSync(filename, "utf-8"));
+};
 
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+exports.getData = function(request, response) {
+    var data = getJsonData(pathToData, 'data.json');
+    setTimeout(function() {
+        return response.send(data);
+    }, 100);
+};
+```
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
+**server.js :**  This is the file we will execute to mock the server. It listens to the port and the API string we have in our “app.get”. If we enter “localhost:3002/api/data” in our browser, our dataController.js file will call getData which would fetch the data from the data.json file in JSON format.
 
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
+```
+const express = require("express");
+const app = express();
+const https = require("https");
 
-## Learn More
+var path = require("path");
+var bodyParser = require("body-parser");
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+app.use(express.static(path.join(__dirname, "build")));
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+var dataController = require("./dataController");
 
-### Code Splitting
+app.get('/api/data', dataController.getData);
 
-This section has moved here: https://facebook.github.io/create-react-app/docs/code-splitting
+const port = 3002;
 
-### Analyzing the Bundle Size
+app.listen(process.env.PORT || port);
+```
+To start your server, run
+```
+node server.js
+```
 
-This section has moved here: https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size
+But, we have to run both react app and express server parallely. our web app currently does not know that our API is mocked on a different port. To resolve this problem, Just add port 3002 as a proxy to your web app.
 
-### Making a Progressive Web App
+so in your package.json, add a proxy so your web app knows that the API is mocked at a different port.
 
-This section has moved here: https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app
+```
+Filename: package.json
 
-### Advanced Configuration
+"proxy": "http://localhost:3002"
+```
 
-This section has moved here: https://facebook.github.io/create-react-app/docs/advanced-configuration
+and change scripts section of package.json as mentioned below
 
-### Deployment
+```
+"scripts": {
+    "dev": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject",
+    "mock-api": "node ./src/Components/server/server.js",
+    "start": "run-p dev mock-api"
+  },
+```
 
-This section has moved here: https://facebook.github.io/create-react-app/docs/deployment
+So, when we start our react app using `npm start`, it will run both react app and mock api server
 
-### `npm run build` fails to minify
+## UI Design
 
-This section has moved here: https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify
+
