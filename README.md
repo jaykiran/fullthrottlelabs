@@ -1,6 +1,6 @@
 # **Full Throttle Assignment**
 
-
+live demo: https://hiring-assignment.netlify.app/
 
 ## why we are using Mock-API ?
 
