@@ -134,6 +134,10 @@ and change scripts section of package.json as mentioned below
 
 So, when we start our react app using `npm start`, it will run both react app and mock api server
 
-## UI Design
+### Another Way to implement Mock API
+
+We can also use third party websites like mockablle.io for creating our mock api using json file and to test endpoints of api, mostly used tool is `postman`.
+
+
 
 

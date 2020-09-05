@@ -2,14 +2,14 @@ import React from 'react';
 import logo from './logo-2.png';
 import './App.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import {Button, Table} from 'react-bootstrap';
+import {Table} from 'react-bootstrap';
 //import { ScheduleComponent, Day, Week, WorkWeek, Month, Agenda, Inject } from '@syncfusion/ej2-react-schedule';
-import {Calendar, momentLocalizer} from 'react-big-calendar';
+//import { momentLocalizer} from 'react-big-calendar';
 import moment from "moment";
 import "react-big-calendar/lib/css/react-big-calendar.css";
 
 moment.locale("en-GB");
-const localizer = momentLocalizer(moment);
+//const localizer = momentLocalizer(moment);
 
 class App extends React.Component{
 
@@ -19,8 +19,8 @@ class App extends React.Component{
       people: [],
       cal_events: []
     };
-    
   }
+
   componentDidMount() {
     fetch("https://demo2523910.mockable.io/userdata/api/members")
       .then(members => members.json())
@@ -43,22 +43,23 @@ class App extends React.Component{
 
   render(){
 
-    const {cal_events} = this.state;
+    //const {cal_events} = this.state; 
 
-    const viewCalendar = () =>{
-      return(
-        <div style={{ height: 700 }}>
-          <Calendar
-            localizer = {localizer}
-            events={cal_events}
-            step={30}
-            defaultView='week'
-            views={['month','week','day']}
-            defaultDate={new Date()}
-          />
-        </div>
-      );
-    }
+    // const viewCalendar = () =>{
+    //   return(
+    //     <div style={{ height: 700 }}>
+    //       <Calendar
+    //         localizer = {localizer}
+    //         events={cal_events}
+    //         step={30}
+    //         defaultView='week'
+    //         views={['month','week','day']}
+    //         defaultDate={new Date()}
+    //       />
+    //     </div>
+    //   );
+    // }
+
   
     return(
       <div className="app">
@@ -70,15 +71,10 @@ class App extends React.Component{
             <h1>Hiring Assignment</h1>
           </div>
         </div>
-        <h1>Fetch a list from an API and display it</h1>
-        {/* Fetch data from API */}
-        <div className="btn-container">
-          <Button className="fetch-button">
-            Fetch Data
-          </Button>
-        <br />
-        </div>
+        <h1>User Data fetched from Mock Api listed Below</h1>
+        
         <div className="container">
+        
           <Table striped bordered hover variant>
             <thead>
               <tr>
@@ -88,17 +84,18 @@ class App extends React.Component{
               </tr>
             </thead>
             <tbody>
-              {this.state.people.map(members =>(
+            {this.state.people.map(members =>(
                 <tr>
                   <td>{members.id}</td>
-                  <td>
-                      {members.real_name} <Button className="activity">View Activity</Button>
+                  <td className="username">
+                      {members.real_name} 
                   </td>
                   <td>{members.tz}</td>
                 </tr>
-              ))}
+            ))}
             </tbody>
           </Table>
+          
         </div>
       </div>
     );
